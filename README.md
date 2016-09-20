@@ -1,4 +1,4 @@
 
-# Archillect  |  |  |  MEMORIES OF AN AUTÓMATON
+# DRZLLECT  |  |  |  MEMORIES OF AN AUTÓMATON
 
-Realtime visualization tool.
+Archillect based realtime visualization tool.
