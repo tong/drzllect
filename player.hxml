@@ -1,5 +1,5 @@
 -js bin/drzllect.js
--main drzllect.Player
+-main drzllect.App
 -cp src
 -lib om.audio
 -dce full
