@@ -1,4 +1,4 @@
-package drzllect;
+package drzllect.player;
 
 import js.Browser.console;
 import js.Browser.document;
@@ -38,12 +38,76 @@ class App {
 		player.canvas.height = window.innerHeight;
 	}
 
+	static function initAudioInput( callback : Void->Void ) {
+
+		untyped navigator.getUserMedia( { audio:true },
+
+			function( stream ){
+
+				audio = new AudioContext();
+
+				var input = audio.createMediaStreamSource( stream );
+
+				//var filter = audio.createBiquadFilter();
+				//filter.type = LOWPASS;
+				//input.connect( filter );
+
+				analyser = audio.createAnalyser();
+				analyser.fftSize = 128;
+
+				input.connect( analyser );
+				//filter.connect( analyser );
+				//filter.connect( analyser );
+
+				bufferLength = analyser.frequencyBinCount;
+				frequencyData = new Uint8Array( bufferLength );
+				timeDomainData = new Uint8Array( bufferLength );
+
+				//analyser.connect( audio.destination );
+
+				meter = new om.audio.VolumeMeter( audio );
+				input.connect( meter.processor );
+
+				callback();
+			},
+
+			function(e) {
+				console.error( e );
+				document.body.classList.add( 'error' );
+				document.body.textContent = e.toString();
+			}
+		);
+	}
+
 	static function main() {
+
+		untyped navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
 		window.onload = function(e) {
 
 			document.body.innerHTML = '';
 
+			initAudioInput( function(){
+
+				var loader = new ImageLoader( 'http://localhost/archillect/' );
+				loader.start( 0, 3599, function(images){
+
+					/*
+					for( img in images ) {
+						document.body.appendChild( img );
+					}
+					*/
+
+					player = new Player();
+					document.body.appendChild( player.canvas );
+
+					player.init( images);
+					window.requestAnimationFrame( update );
+				});
+			});
+
+
+			/*
 			player = new Player();
 			document.body.appendChild( player.canvas );
 
@@ -80,7 +144,8 @@ class App {
 						trace("PLAYER");
 						player.init( images);
 						window.requestAnimationFrame( update );
-					}).start( 3600 );
+					//}).start( 3600 );
+					}).start( 36 );
 				},
 				function(e) {
 					console.error( e );
@@ -90,6 +155,7 @@ class App {
 			);
 
 			window.addEventListener( 'resize', handleWindowResize, false );
+			*/
 		}
 	}
 }

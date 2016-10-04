@@ -1,9 +1,10 @@
 -js bin/drzllect.js
--main drzllect.App
+-main drzllect.player.App
 -cp src
 -lib om.audio
 -dce full
 -debug
 
 -cmd cp res/html/index.html bin/
+-cmd cp -r res/script/ bin/
 -cmd lessc res/style/drzllect.less bin/drzllect.css

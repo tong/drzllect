@@ -1,4 +1,4 @@
-package drzllect;
+package drzllect.player;
 
 import js.Browser.console;
 import js.Browser.document;
@@ -19,10 +19,12 @@ class Player {
 	var ctx : CanvasRenderingContext2D;
 	var images : Array<ImageElement>;
 	var currentIndex : Int;
-
 	var lastVolume : Float;
+	var framesPlayed : Int;
 
 	public function new() {
+
+		framesPlayed = 0;
 
 		canvas = document.createCanvasElement();
 		canvas.width = window.innerWidth;
@@ -40,9 +42,18 @@ class Player {
 
 	public function update( volume : Float, frequency : Uint8Array ) {
 
+		framesPlayed++;
+
+		var img = images[framesPlayed-1];
+		ctx.save();
+		ctx.scale( window.innerWidth/img.width, window.innerHeight/img.height );
+		ctx.drawImage( img, 0, 0 );
+		ctx.restore();
+
+		/*
 		//TODO
 
-		trace(volume );
+		//trace(volume );
 		//ctx.clearRect( 0, 0, canvas.width, canvas.height );
 
 		var clearStage = false;
@@ -68,13 +79,15 @@ class Player {
 				ctx.clearRect( 0, 0, canvas.width, canvas.height );
 			return;
 		}
-		*/
+		* /
 
 		lastVolume = volume;
 
 		var nindex = images.length - Std.int( images.length * volume ) - 1;
 		if( nindex != currentIndex ) {
+
 			currentIndex = nindex;
+
 			var img = images[currentIndex];
 			ctx.clearRect(0,0,canvas.width, canvas.height);
 			ctx.save();
