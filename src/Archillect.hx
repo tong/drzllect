@@ -148,9 +148,6 @@ class Archillect {
 	*/
 	public static function sortByBrightness( srcDir : String, dstDir : String ) {
 
-		//var srcDir = '/home/tong/dev/archillect_0-50000_jpg';
-		//var dstDir = '/home/tong/dev/archillect';
-
 		var imagePaths = FileSystem.readDirectory( srcDir );
 		//imagePaths.sort( sortImageFiles );
 
@@ -221,6 +218,20 @@ class Archillect {
 			//trace( srcDir+'/'+sortedImagePaths[i], '$dstDir/$i.jpg' );
 			File.copy( srcDir+'/'+sortedImagePaths[i], '$dstDir/$i.jpg' );
 		}
+	}
+
+	static inline function sortIntArray( a : Int, b : Int ) : Int {
+		return (a > b) ? 1 : (a < b) ? -1 : 0;
+	}
+
+	static inline function getImageId( name : String ) : Int {
+		return Std.parseInt( name.substr( 0, name.indexOf( '-' ) ) );
+	}
+
+	static function sortImageFiles( a : String, b : String ) : Int {
+		var i = getImageId(a);
+		var j = getImageId(b);
+		return (i > j) ? 1 : (i < j) ? -1 : 0;
 	}
 
 }
