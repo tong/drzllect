@@ -10,6 +10,8 @@ import neko.vm.Thread;
 import Sys.print;
 import Sys.println;
 
+using StringTools;
+
 class Archillect {
 
 	/**
@@ -140,6 +142,86 @@ class Archillect {
 		}
 	}
 	*/
+
+	/**
+		Sort images by brightness.
+	*/
+	public static function sortByBrightness( srcDir : String, dstDir : String ) {
+
+		//var srcDir = '/home/tong/dev/archillect_0-50000_jpg';
+		//var dstDir = '/home/tong/dev/archillect';
+
+		var imagePaths = FileSystem.readDirectory( srcDir );
+		//imagePaths.sort( sortImageFiles );
+
+		var imageColors = new Array<Int>();
+		var nStart = 0;
+		var n = 3600;
+
+		//for( i in 0...imagePaths.length ) {
+		for( i in 0...n ) {
+			var file = imagePaths[i];
+			var path = '$srcDir/$file';
+			var identify = new Process( 'convert', [path,'-resize','1x1!','-format','"%[fx:int(255*r+.5)],%[fx:int(255*g+.5)],%[fx:int(255*b+.5)]"','info:'] );
+			var result = identify.stdout.readAll();
+			var error = identify.stderr.readAll().toString();
+			if( error != "" ) {
+				trace(error.toString());
+				return;
+			} else {
+				var val = result.toString().trim();
+				var val = val.substr( 1 );
+				val = val.substr( 0, val.indexOf('"') );
+				var rgb = val.split(',');
+				var brightness = ((Std.parseInt(rgb[0]) & 0xFF) << 16) | ((Std.parseInt(rgb[1]) & 0xFF) << 8) | ((Std.parseInt(rgb[2]) & 0xFF) << 0);
+				imageColors.push( brightness );
+
+				println(i);
+
+				//out.append( brightness );
+			}
+			identify.close();
+
+			//if( numImages++ == _max ) break;
+			if( i % 100 == 0 ) Sys.sleep(1);
+			if( i % 1000 == 0 ) Sys.sleep(5);
+		}
+
+		Sys.println( ">" );
+
+		var sortedImagePaths = new Array<String>();
+		var sortedImageColors = new Array<Int>();
+
+		//for( i in 0...imagePaths.length ) {
+		for( i in 0...n ) {
+			if( i == 0 ) {
+				sortedImagePaths.push( imagePaths[0] );
+				sortedImageColors.push( imageColors[0] );
+			} else {
+				var f1 = imagePaths[i];
+				var v1 = imageColors[i];
+				var inserted = false;
+				for( j in 0...sortedImageColors.length ) {
+					var v2 = sortedImageColors[j];
+					if( v1 > v2 ) {
+						sortedImagePaths.insert( j, f1 );
+						sortedImageColors.insert( j, v1 );
+						inserted = true;
+						break;
+					}
+				}
+				if( !inserted ) {
+					sortedImagePaths.push( f1 );
+					sortedImageColors.push( v1 );
+				}
+			}
+		}
+
+		for( i in 0...sortedImagePaths.length ) {
+			//trace( srcDir+'/'+sortedImagePaths[i], '$dstDir/$i.jpg' );
+			File.copy( srcDir+'/'+sortedImagePaths[i], '$dstDir/$i.jpg' );
+		}
+	}
 
 }
 
